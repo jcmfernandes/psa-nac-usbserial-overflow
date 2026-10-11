@@ -6,8 +6,9 @@ L=$REPO/lab/tmp/build.log
 cd "$S" || exit 1
 : >"$L"
 export ARCH=arm CROSS_COMPILE=armv7l-unknown-linux-gnueabihf-
-# 3.10 only knows gcc3/gcc4 headers; gcc 15 needs the gcc4 one aliased.
+# 3.10 only knows gcc3/gcc4 headers; gcc >= 15 needs the gcc4 one aliased.
 [ -f include/linux/compiler-gcc15.h ] || ln -s compiler-gcc4.h include/linux/compiler-gcc15.h
+[ -f include/linux/compiler-gcc16.h ] || ln -s compiler-gcc4.h include/linux/compiler-gcc16.h
 # gcc15 renumbers asm operands -> __asmeq ".err" fires spuriously (gcc PR15089
 # check, ancient). Lab-only: neutralize the check.
 sed -i 's|^#define __asmeq(x, y).*|#define __asmeq(x, y)  ""|' arch/arm/include/asm/compiler.h
@@ -24,6 +25,7 @@ sed -i 's|obj-\$(CONFIG_OF).*+= of.o|obj-$(CONFIG_USB_PHY) += of.o|' drivers/usb
 python3 -I "$REPO/lab/patch-umh-debug.py" "$S" || echo PATCH-FAIL
 make mrproper >>"$L" 2>&1
 ln -sf compiler-gcc4.h include/linux/compiler-gcc15.h 2>/dev/null
+ln -sf compiler-gcc4.h include/linux/compiler-gcc16.h 2>/dev/null
 make vexpress_defconfig >>"$L" 2>&1 || { echo DEFCONFIG-FAIL; exit 1; }
 for l in CONFIG_USB_SUPPORT CONFIG_USB CONFIG_USB_GADGET CONFIG_USB_DUMMY_HCD \
          CONFIG_USB_GADGETFS CONFIG_USB_SERIAL CONFIG_USB_SERIAL_FTDI_SIO \

