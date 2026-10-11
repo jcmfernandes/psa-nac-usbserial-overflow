@@ -94,6 +94,23 @@ extraction with `-I`, scripts outside it.
    `UMHDBG: umh entry path=/bin/sh` and the patched /etc/passwd
    dumped to console.
 
+## Changing the payload
+
+The payload is the CMD string in `lab/gen_blob.py`'s presets
+(ordered as `(n_eps, hijack, helper, CMD, wait)`).
+
+- lab: edit the `lab-sed` preset, `python3 -I gen_blob.py lab-sed`,
+  then `sh mkinitramfs.sh` — the initrd packs its own blob copy —
+  and `timeout 90 sh run-lab.sh > tmp/boot.log`.
+- car: edit the `car` preset, `python3 -I gen_blob.py car
+  exploit/ftdi_blob_car`, copy to the Pi, re-run the deploy.
+- CMD constraints (~145 bytes; blob is 252 shared with shellcode,
+  argv, helper addr): no NUL, no 04/05 control bytes — normal shell
+  text qualifies. `pad_cmd()` pads trailing spaces for the
+  alignment (a sh -c no-op).
+- No address re-pin needed: CMD is data. Only kernel rebuilds move
+  the helper addresses.
+
 ## Deploy
 
 See `exploit/INSTRUCTIONS.md`. Summary: dwc2 overlay on the Pi,
