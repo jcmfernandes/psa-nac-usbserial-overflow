@@ -48,7 +48,6 @@ hijacked LR, no further stack use.
   - `raw_gadget_src/` — kernel module source v6.6 + Makefile
     (`raw_gadget-7.2.c` kept for the v6.7+ DELAYED_STATUS difference)
   - `INSTRUCTIONS.md` — step-by-step deployment + troubleshooting
-  - `ftdi_crash.py` — original crash-only PoC (gadgetfs era), superseded
 - `lab/` — QEMU vexpress-a9 lab reproducing the car kernel
   - `build-kernel.sh` — NXP 3.10.53 + gcc15 cross, gadgetfs/dummy_hcd/
     ftdi_sio/pl2303/usbserial builtin (six gcc15 build fixes)
