@@ -49,8 +49,9 @@ hijacked LR, no further stack use.
     (`raw_gadget-7.2.c` kept for the v6.7+ DELAYED_STATUS difference)
   - `INSTRUCTIONS.md` — step-by-step deployment + troubleshooting
 - `lab/` — QEMU vexpress-a9 lab reproducing the car kernel
-  - `build-kernel.sh` — NXP 3.10.53 + gcc15 cross, gadgetfs/dummy_hcd/
-    ftdi_sio/pl2303/usbserial builtin (six gcc15 build fixes)
+  - `build-kernel.sh` — NXP 3.10.53 + gcc16 cross (15 also builds —
+    the script aliases the compiler-gccN.h headers), gadgetfs/
+    dummy_hcd/ftdi_sio/pl2303/usbserial builtin (six gcc15 build fixes)
   - `mkinitramfs.sh` — initramfs from the car's own busybox+eglibc,
     packs the blob; `gen_blob.py` builds the gadgetfs blob file
   - `run-lab.sh` — boots the lab with the blob attack
