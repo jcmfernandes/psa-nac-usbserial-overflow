@@ -35,6 +35,20 @@ pointer, and the "HORRIBLE HACK" path (`num_bulk_out==0`) returns
 -ENODEV right after the endpoint loop — clean return through the
 hijacked LR, no further stack use.
 
+## What boots as /
+
+fstab is empty — the root mount comes from the bootloader's kernel
+cmdline attachment: `root=ubi0_50/51` ubifs-on-NAND (HW2016/HW2019
+bootloaders) or `root=/dev/mmcblk1p5/p6 rootfstype=ext4` (HW2020+).
+The SWL ships both rootfs images for the whole hardware fleet; the
+two are byte-identical where it matters (zImage, passwd family,
+DiagSvcTsw — cmp-verified), and `/etc` is not overlaid (only /var,
+/opt get bind-mounted from a separate ubi volume). So the payload's
+`mount -o remount,rw /` works either way — the vendor's own
+early-init does the same remount dance on the live root. Which medium
+a given unit boots shows in its `cat /proc/cmdline` (`root=ubi0_51`
+vs `root=/dev/mmcblk1p6`).
+
 ## Layout
 
 - `devenv.nix` / `devenv.yaml` — devenv shell (`devenv shell`) with the
