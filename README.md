@@ -72,7 +72,10 @@ Inputs live under `work/` (gitignored — provide them yourself):
 - `work/kernel-src/` — NXP imx_3.10.53_1.1.0_ga kernel source tree
   (linux-imx-imx_3.10.53_1.1.0_ga_caf; 1.3 GB from NXP's repo)
 - `work/emmc/out/` — extracted car eMMC image (busybox, eglibc, /etc —
-  what the lab initramfs and payload pre-checks are built on)
+  what the lab initramfs and payload pre-checks are built on);
+  `lab/setup-work.sh` builds it from PSA's public firmware server +
+  ludwig-v's SMIME key (download, per-part decrypt, debugfs rdump —
+  all userspace, no sudo, runs inside the devenv shell)
 
 Transient lab outputs go to `lab/tmp/` (gitignored): build.log, initrd.gz,
 ftdi_blob, gdb boot logs. Untrusted-data rule: run Python over the
