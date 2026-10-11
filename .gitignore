@@ -1,5 +1,6 @@
 # transient lab artifacts
 lab/tmp/
+lab/logs/
 
 # devenv state
 .devenv/

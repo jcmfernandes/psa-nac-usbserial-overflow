@@ -61,12 +61,9 @@ hijacked LR, no further stack use.
   - `car.config` — the car's own kernel config, extracted from the
     `IKCFG_ST` blob of its vmlinux (target evidence, not a lab input —
     the lab builds its own vexpress-a9 config)
-  - `logs/` — evidence: boot-lab25.log (first full-chain success:
-    payload ran, zero oops), boot-lab33.log (sed patch verified on the
-    car's real /etc/passwd after the alignment fix),
-    pwn-host-test.log (raw-gadget port byte-verified on a 7.2 host
-    with dummy_hcd), boot-gcc16.log (same chain end-to-end from the
-    nix dev shell, gcc16 cross)
+  - `logs/` (gitignored) — local evidence captures: full-chain boot
+    logs (lab25/lab33/gcc16 builds), the verified passwd patch, the
+    raw-gadget host test
 
 Inputs live under `work/` (gitignored — provide them yourself):
 - `work/kernel-src/` — NXP imx_3.10.53_1.1.0_ga kernel source tree
@@ -94,7 +91,7 @@ extraction with `-I`, scripts outside it.
    from the new System.map first).
 4. `timeout 90 sh run-lab.sh > tmp/boot.log` — expect
    `UMHDBG: umh entry path=/bin/sh` and the patched /etc/passwd
-   dumped to console (see `logs/boot-gcc16.log`).
+   dumped to console.
 
 ## Deploy
 
