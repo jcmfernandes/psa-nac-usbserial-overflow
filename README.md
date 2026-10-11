@@ -108,8 +108,7 @@ The payload is the CMD string in `lab/gen_blob.py`'s presets
   exploit/ftdi_blob_car`, copy to the Pi, re-run the deploy.
 - CMD constraints (~145 bytes hard cap — blob is 252, shared with
   shellcode, argv, helper addr; the build asserts on overflow).
-  The car CMD is already 135 bytes — ~9 bytes of headroom; a
-  bigger payload needs a slimmer command or a second stage.
+  The car CMD is 109 bytes — ~36 bytes of headroom.
   No NUL, no 04/05 control bytes — normal shell text qualifies.
   `pad_cmd()` pads trailing spaces for the alignment (a sh -c
   no-op).

