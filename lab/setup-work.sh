@@ -10,11 +10,13 @@ REPO=$(cd "$(dirname "$0")/.." && pwd)
 W=$REPO/work
 URL=https://majestic-web.mpsa.com/nas/eu/mjb00/PSA/mjbsu/PSA_ovip-int-firmware-version_44-07-33-32_NAC-r0_NAC_EUR_WAVE4.tar
 SIZE=6312212480          # server Content-Length; full file = download done
-KEYREPO=https://github.com/ludwig-v/psa-nac-firmware-reverse-engineering
-KEY=Firmware_Keys/WAVE4/44.07.33-32-r0.key
-T=$W/third/psa-nac-firmware-reverse-engineering
+# Per-version SMIME firmware key from ludwig-v's research, which
+# extracted and published PSA's firmware keys:
+# https://github.com/ludwig-v/psa-nac-firmware-reverse-engineering
+KEY_URL=https://raw.githubusercontent.com/ludwig-v/psa-nac-firmware-reverse-engineering/master/Firmware_Keys/WAVE4/44.07.33-32-r0.key
+KEY=$W/third/44.07.33-32-r0.key
 
-for c in curl git tar openssl debugfs find; do
+for c in curl tar openssl debugfs find; do
   command -v "$c" >/dev/null || { echo "missing: $c (run inside devenv shell)"; exit 1; }
 done
 
@@ -29,8 +31,8 @@ cur=0
 if [ -f "$W/firmware.tar" ]; then cur=$(wc -c < "$W/firmware.tar"); fi
 if [ "$cur" -ne "$SIZE" ]; then curl -C - -o "$W/firmware.tar" "$URL"; fi
 
-# 2. ludwig-v's per-version key
-if [ ! -d "$T" ]; then git clone --depth 1 "$KEYREPO" "$T"; fi
+# 2. per-version key (see attribution at the top)
+if [ ! -f "$KEY" ]; then curl -fsSL -o "$KEY" "$KEY_URL"; fi
 
 # 3. extract only the eMMC image parts (each part is its own SMIME blob)
 tar xf "$W/firmware.tar" -C "$W/firmware" \
@@ -41,7 +43,7 @@ if [ -z "$EMMC" ]; then echo "no EMMC dir in the tar"; exit 1; fi
 # 4. decrypt the parts in order, concatenate -> ext4 image (~768 MB)
 : > "$W/emmc-ext4.img"
 for f in "$EMMC"/rootfs-emmc.fsn "$EMMC"/rootfs-emmc.fsn0*; do
-  openssl smime -decrypt -in "$f" -inkey "$T/$KEY" >> "$W/emmc-ext4.img"
+  openssl smime -decrypt -in "$f" -inkey "$KEY" >> "$W/emmc-ext4.img"
 done
 echo "ext4 image: $(wc -c < "$W/emmc-ext4.img") bytes"
 

@@ -70,8 +70,10 @@ Inputs live under `work/` (gitignored — provide them yourself):
 - `work/emmc/out/` — extracted car eMMC image (busybox, eglibc, /etc —
   what the lab initramfs and payload pre-checks are built on);
   `lab/setup-work.sh` builds it from PSA's public firmware server +
-  ludwig-v's SMIME key (download, per-part decrypt, debugfs rdump —
-  all userspace, no sudo, runs inside the devenv shell)
+  the SMIME key published by ludwig-v's
+  [psa-nac-firmware-reverse-engineering](https://github.com/ludwig-v/psa-nac-firmware-reverse-engineering)
+  (download, per-part decrypt, debugfs rdump — all userspace, no sudo,
+  runs inside the devenv shell)
 
 Transient lab outputs (initramfs, blob, logs) land in `lab/tmp/`
 (gitignored). Untrusted-data rule: run Python over the
