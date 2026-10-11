@@ -1,13 +1,15 @@
 #!/bin/sh
-# Populate work/emmc from scratch: download the wave4 firmware from
-# PSA's public server, decrypt the split eMMC image with ludwig-v's
-# SMIME key, dump the ext4 tree with debugfs.
+# Populate work/ from scratch: the NXP kernel source (GitHub mirror of
+# NXP's tree, ~1.3 GB) and the car's eMMC tree — the latter from PSA's
+# public firmware server, decrypted with ludwig-v's SMIME key, dumped
+# with debugfs.
 # All userspace - no sudo, no kernel modules. Run inside `devenv shell`
-# (it provides curl, git, openssl, e2fsprogs' debugfs).
+# (it provides curl, tar, openssl, e2fsprogs' debugfs).
 set -eu
 
 REPO=$(cd "$(dirname "$0")/.." && pwd)
 W=$REPO/work
+KSRC_URL=https://codeload.github.com/nxp-imx/linux-imx/tar.gz/refs/heads/imx_3.10.53_1.1.0_ga_caf
 URL=https://majestic-web.mpsa.com/nas/eu/mjb00/PSA/mjbsu/PSA_ovip-int-firmware-version_44-07-33-32_NAC-r0_NAC_EUR_WAVE4.tar
 SIZE=6312212480          # server Content-Length; full file = download done
 # Per-version SMIME firmware key from ludwig-v's research, which
@@ -19,6 +21,19 @@ KEY=$W/third/44.07.33-32-r0.key
 for c in curl tar openssl debugfs find; do
   command -v "$c" >/dev/null || { echo "missing: $c (run inside devenv shell)"; exit 1; }
 done
+
+mkdir -p "$W"
+
+# 0. NXP kernel source for build-kernel.sh (~1.3 GB; codeload streams,
+#    no resume)
+if [ ! -e "$W/kernel-src" ]; then
+  curl -fL -o "$W/kernel-src.tar.gz" "$KSRC_URL"
+  dir=$(tar tzf "$W/kernel-src.tar.gz" | head -n 1 | cut -d/ -f1)
+  tar xf "$W/kernel-src.tar.gz" -C "$W"
+  rm "$W/kernel-src.tar.gz"
+  ln -s "$dir" "$W/kernel-src"
+  echo "kernel source: $W/$dir"
+fi
 
 if [ -e "$W/emmc" ]; then
   echo "work/emmc already exists - remove it first to redo extraction"

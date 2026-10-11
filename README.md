@@ -66,7 +66,8 @@ hijacked LR, no further stack use.
 
 Inputs live under `work/` (gitignored — provide them yourself):
 - `work/kernel-src/` — NXP imx_3.10.53_1.1.0_ga kernel source tree
-  (linux-imx-imx_3.10.53_1.1.0_ga_caf; 1.3 GB from NXP's repo)
+  (linux-imx-imx_3.10.53_1.1.0_ga_caf; ~1.3 GB, fetched by
+  `lab/setup-work.sh` from NXP's GitHub mirror)
 - `work/emmc/out/` — extracted car eMMC image (busybox, eglibc, /etc —
   what the lab initramfs and payload pre-checks are built on);
   `lab/setup-work.sh` builds it from PSA's public firmware server +
@@ -83,7 +84,8 @@ extraction with `-I`, scripts outside it.
 
 0. `devenv shell` — pulls every tool via devenv.nix (cross gcc,
    kernel build deps, cpio, qemu, gdb, python3).
-1. Get NXP imx_3.10.53_1.1.0_ga source.
+1. `sh setup-work.sh` — fetches the NXP source into `work/kernel-src/`
+   (skips what's already there; also builds `work/emmc/` if missing).
 2. `build-kernel.sh` (~8 min; gcc 15 and 16 both build — the script
    aliases their compiler-gccN.h headers).
 3. `python3 -I gen_blob.py lab-sed` then `sh mkinitramfs.sh`
