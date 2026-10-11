@@ -77,8 +77,8 @@ Inputs live under `work/` (gitignored — provide them yourself):
   ludwig-v's SMIME key (download, per-part decrypt, debugfs rdump —
   all userspace, no sudo, runs inside the devenv shell)
 
-Transient lab outputs go to `lab/tmp/` (gitignored): build.log, initrd.gz,
-ftdi_blob, gdb boot logs. Untrusted-data rule: run Python over the
+Transient lab outputs (initramfs, blob, logs) land in `lab/tmp/`
+(gitignored). Untrusted-data rule: run Python over the
 extraction with `-I`, scripts outside it.
 
 ## Reproduce the lab
@@ -92,7 +92,7 @@ extraction with `-I`, scripts outside it.
    (re-run after every blob change — the initrd packs a copy; after a
    kernel rebuild, re-pin the lab preset helper addrs in gen_blob.py
    from the new System.map first).
-4. `timeout 90 sh run-lab.sh > boot.log` — expect
+4. `timeout 90 sh run-lab.sh > tmp/boot.log` — expect
    `UMHDBG: umh entry path=/bin/sh` and the patched /etc/passwd
    dumped to console (see `logs/boot-gcc16.log`).
 
