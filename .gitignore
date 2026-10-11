@@ -1,0 +1,19 @@
+# transient lab artifacts
+lab/tmp/
+initrd.gz
+ftdi_blob
+
+# large inputs (provide yourself; see README)
+work/
+
+# python
+__pycache__/
+*.pyc
+
+# out-of-tree module build
+*.o
+*.ko
+*.mod.c
+.tmp_versions/
+Module.symvers
+modules.order
