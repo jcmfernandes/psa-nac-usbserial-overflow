@@ -1,6 +1,6 @@
 # NAC usb-serial stack overflow — research repo
 
-Authorized security research on my own PSA NAC head unit
+Security research on my own PSA NAC head unit
 (NAC_EUR_WAVE4, Continental OVIP i.MX6 ARM32, firmware
 44.07.33.33_NAC-r0, kernel 3.10.53 NXP imx_3.10.53_1.1.0_ga).
 Goal: passwordless root on the diagnostic UART console of my own unit.
