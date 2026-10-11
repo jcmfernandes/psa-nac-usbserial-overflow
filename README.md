@@ -61,9 +61,8 @@ hijacked LR, no further stack use.
   - `car.config` — the car's own kernel config, extracted from the
     `IKCFG_ST` blob of its vmlinux (target evidence, not a lab input —
     the lab builds its own vexpress-a9 config)
-  - `logs/` (gitignored) — local evidence captures: full-chain boot
-    logs (lab25/lab33/gcc16 builds), the verified passwd patch, the
-    raw-gadget host test
+  - evidence captures (full-chain boot logs, the verified passwd
+    patch, the raw-gadget host test) live outside the repo
 
 Inputs live under `work/` (gitignored — provide them yourself):
 - `work/kernel-src/` — NXP imx_3.10.53_1.1.0_ga kernel source tree
