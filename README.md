@@ -147,4 +147,5 @@ root console is passwordless.
 ## License
 
 GPL-3.0-or-later — see LICENSE. Exception: `exploit/raw_gadget_src/`
-is vendored Linux kernel source and stays GPL-2.0.
+is vendored Linux kernel source and stays GPL-2.0
+(see `exploit/raw_gadget_src/COPYING`).
