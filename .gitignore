@@ -1,5 +1,8 @@
 # transient lab artifacts
 lab/tmp/
+
+# devenv state
+.devenv/
 initrd.gz
 ftdi_blob
 
