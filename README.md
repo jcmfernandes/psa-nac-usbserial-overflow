@@ -55,6 +55,9 @@ hijacked LR, no further stack use.
   - `patch-umh-debug.py` — UMHDBG/EPDBG printk instrumentation
   - `gdb.cmd` / `gdb-entry.sh` — gdbstub ground-truth scripts
   - `check_desc.py` — sysfs byte-compare of served descriptors
+  - `car.config` — the car's own kernel config, extracted from the
+    `IKCFG_ST` blob of its vmlinux (target evidence, not a lab input —
+    the lab builds its own vexpress-a9 config)
   - `logs/` — evidence: boot-lab25.log (first full-chain success:
     payload ran, zero oops), boot-lab33.log (sed patch verified on the
     car's real /etc/passwd after the alignment fix),
