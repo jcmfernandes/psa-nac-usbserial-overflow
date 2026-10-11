@@ -126,3 +126,7 @@ root console is passwordless.
 - The car's /etc/passwd is a symlink (flattened on extraction) to
   `passwd-user-access-rights-inactive-closed`; the sed pattern targets
   its active root line.
+## License
+
+GPL-3.0-or-later — see LICENSE. Exception: `exploit/raw_gadget_src/`
+is vendored Linux kernel source and stays GPL-2.0.
