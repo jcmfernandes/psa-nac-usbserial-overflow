@@ -59,9 +59,10 @@ vs `root=/dev/mmcblk1p6`).
   too)
   - `nac_pwn.py` — raw-gadget attacker, takes a payload name
   - `payloads/` — car payload blobs (`sed`: root UART; `cfg`: AA
-    autoconnect flag; `both`; `reboot`: no-side-effect chain test),
-    built by `lab/gen_blob.py` presets `car-sed` / `car-cfg` /
-    `car-both` / `car-reboot`
+    autoconnect flag; `both`; `reboot`: no-side-effect chain test;
+    `telnet`: busybox nc listener, root shell on port 23), built by
+    `lab/gen_blob.py` presets `car-sed` / `car-cfg` / `car-both` /
+    `car-reboot` / `car-telnet`
   - `setup-pi.sh` — dwc2 overlay check, out-of-tree raw_gadget module
     build+load (Pi OS ships none)
   - `raw_gadget_src/` — kernel module source v6.6 + Makefile
@@ -141,9 +142,10 @@ See `exploit/INSTRUCTIONS.md`. Summary: `dtoverlay=dwc2,dr_mode=peripheral`
 on the Pi, GPIO-header 5V power (the Pi 5's USB-C is the gadget port),
 `setup-pi.sh` builds+loads raw_gadget (module source matched to the
 kernel: pre-6.6 vs 6.7+ DELAYED_STATUS), plug into the car, run
-`sudo python3 nac_pwn.py sed` (or `cfg` / `both` / `reboot`); head
-unit reboots (the `sed`/`both`/`reboot` payloads); UART root console
-is passwordless.
+`sudo python3 nac_pwn.py sed` (or `cfg` / `both` / `reboot` / `telnet`);
+head unit reboots (the `sed`/`both`/`reboot` payloads); UART root console
+is passwordless; `telnet` leaves a root shell on port 23 (busybox nc
+server, gone at reboot).
 
 ## Gotchas learned the hard way
 

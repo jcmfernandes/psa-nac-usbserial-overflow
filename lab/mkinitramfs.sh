@@ -6,7 +6,7 @@ REPO=$(cd "$(dirname "$0")/.." && pwd)
 P=$REPO/work/emmc
 R=$REPO/lab/tmp/initramfs
 rm -rf "$R" && mkdir -p "$R"/{bin,sbin,proc,sys,dev,tmp,lib}
-for a in sh cat mount umount gunzip zcat poweroff halt ls sleep grep head tail dmesg echo mkdir sed; do
+for a in sh cat mount umount gunzip zcat poweroff halt reboot ls sleep grep head tail dmesg echo mkdir sed ifconfig; do
   ln -sf busybox "$R/bin/$a"
 done
 mkdir -p "$R/etc"
@@ -21,6 +21,9 @@ cat > "$R/init" <<'EOF'
 #!/bin/sh
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
+# devtmpfs, like the car (CONFIG_DEVTMPFS_MOUNT=y there): gives /dev/ptmx
+# for telnetd ptys and every other node; shadows the two mknod'ed ones.
+mount -t devtmpfs devtmpfs /dev
 echo "===LAB-BOOT-OK==="
 mkdir -p /dev/gadget
 mount -t gadgetfs gadgetfs /dev/gadget || echo "gadgetfs mount FAILED"

