@@ -84,6 +84,19 @@ PRESETS = {
     # -F/-p, it just takes over stdio. nc needs no devpts, no pty.
     # After: connect to the car's wifi hotspot, telnet/nc <unit-ip> 23.
     'car-telnet': (27, 26, 0x8003e7c0, 'busybox nc -ll -p 23 -e /bin/sh'),
+    # splash: paint a picture on the head unit's screen - visible proof
+    # the chain ran, no side effects (like reboot, but you can see it).
+    # /dev/fb0 IS the screen: the UI compositor draws into it
+    # (etc/wayland/compositor.conf: fb = /dev/fb0), so a raw write shows
+    # up; the UI repaints over it on its next frame. Same mechanism the
+    # vendor's own EarlyDisplayConfiguration uses for the boot splash
+    # (/bin/busybox lzopcat /usr/share/screens/*.fb.lzo > /dev/fb0).
+    # screen3 = Toyota (screen0 Peugeot, 1 Citroen, 2/18 DS, 4/20 Opel,
+    # 5/21 Vauxhall, 7 Fiat). Only screen0/1/2/4/5 have _HD variants
+    # (1280x768); on an HD panel the 800x480 file lands in the top-left
+    # with a wrong stride. 800x480 panels (SD) get it right.
+    'car-splash': (27, 26, 0x8003e7c0,
+                   'lzop -dc /usr/share/screens/screen3.fb.lzo>/dev/fb0'),
     # lab twin of car-telnet under QEMU user networking (10.0.2.15):
     # bring eth0 up first, then the same listener. Validated end-to-end
     # 2026-10-19 (telnet in from host, uid=0). Needs the ifconfig applet

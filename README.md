@@ -60,9 +60,10 @@ vs `root=/dev/mmcblk1p6`).
   - `nac_pwn.py` — raw-gadget attacker, takes a payload name
   - `payloads/` — car payload blobs (`sed`: root UART; `cfg`: AA
     autoconnect flag; `both`; `reboot`: no-side-effect chain test;
-    `telnet`: busybox nc listener, root shell on port 23), built by
+    `telnet`: busybox nc listener, root shell on port 23; `splash`:
+    Toyota logo on the head unit's screen), built by
     `lab/gen_blob.py` presets `car-sed` / `car-cfg` / `car-both` /
-    `car-reboot` / `car-telnet`
+    `car-reboot` / `car-telnet` / `car-splash`
   - `setup-pi.sh` — dwc2 overlay check, out-of-tree raw_gadget module
     build+load (Pi OS ships none)
   - `raw_gadget_src/` — kernel module source v6.6 + Makefile
@@ -142,10 +143,12 @@ See `exploit/INSTRUCTIONS.md`. Summary: `dtoverlay=dwc2,dr_mode=peripheral`
 on the Pi, GPIO-header 5V power (the Pi 5's USB-C is the gadget port),
 `setup-pi.sh` builds+loads raw_gadget (module source matched to the
 kernel: pre-6.6 vs 6.7+ DELAYED_STATUS), plug into the car, run
-`sudo python3 nac_pwn.py sed` (or `cfg` / `both` / `reboot` / `telnet`);
-head unit reboots (the `sed`/`both`/`reboot` payloads); UART root console
-is passwordless; `telnet` leaves a root shell on port 23 (busybox nc
-server, gone at reboot).
+`sudo python3 nac_pwn.py sed` (or `cfg` / `both` / `reboot` / `telnet` /
+`splash`); head unit reboots (the `sed`/`both`/`reboot` payloads); UART
+root console is passwordless; `telnet` leaves a root shell on port 23
+(busybox nc server, gone at reboot); `splash` paints the Toyota logo on
+the head unit's screen (800x480 panels only — that is the only size the
+vendor ships for Toyota).
 
 ## Gotchas learned the hard way
 
