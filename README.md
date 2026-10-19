@@ -57,6 +57,17 @@ early-init does the same remount dance on the live root. Which medium
 a given unit boots shows in its `cat /proc/cmdline` (`root=ubi0_51`
 vs `root=/dev/mmcblk1p6`).
 
+The SWL also ships a third filesystem, `tsw.fsn` (NAND) /
+`tsw-emmc.fsn` (eMMC), plus its own kernel (`tsw-kernel*.nbx`). It is a
+separate factory test build of the same system — Continental's own unit
+description reads "Testsoftware for HW validation and verification
+Tests". It shares the base and `brsCore`; the test programs (`Tsw`,
+`RadioAppTSW`, `TSWNav_*`, `btsvc_main`) exist only there, while
+`DiagSvcTsw` exists only in the main rootfs. The main system does not
+call into the tsw image. Nothing in either rootfs selects it at boot
+(the boot-mode machinery knows only SWL/FAST); that would be a
+bootloader decision, and the SWL carries no bootloader.
+
 ## Layout
 
 - `devenv.nix` / `devenv.yaml` — devenv shell (`devenv shell`) with the
