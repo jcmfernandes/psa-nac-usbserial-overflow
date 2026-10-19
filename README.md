@@ -2,7 +2,9 @@
 
 Security research on my own PSA NAC head unit
 (NAC_EUR_WAVE4, Continental OVIP i.MX6 ARM32, firmware
-44.07.33.33_NAC-r0, kernel 3.10.53 NXP imx_3.10.53_1.1.0_ga).
+44.07.33.32_NAC-r0, kernel 3.10.53 NXP imx_3.10.53_1.1.0_ga) —
+the same build the extracted firmware image is, so every verified
+address below comes from the exact build the unit runs.
 Goal: passwordless root on the diagnostic UART console of my own unit.
 
 ## The bug
