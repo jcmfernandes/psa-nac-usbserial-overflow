@@ -52,6 +52,10 @@ PRESETS = {
                 'mount -o remount,rw / ; '
                 'echo autoconnect=true > /home/root/cfg ; '
                 'sync ; mount -o remount,ro /'),
+    # reboot: chain test with no side effects - pause, then reboot -f.
+    # First shot on the real car: proves the whole chain without
+    # touching passwd or cfg.
+    'car-reboot': (27, 26, 0x8003e7c0, 'sleep 5 ; reboot -f'),
     # both: sed + cfg in one shot. Tight fit: ';'-separated without spaces
     # to stay inside the 145-byte CMD budget.
     'car-both': (27, 26, 0x8003e7c0,
